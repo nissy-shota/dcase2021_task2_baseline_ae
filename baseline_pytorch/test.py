@@ -317,7 +317,7 @@ def main():
                 save_anomaly_score(score_list, target_dir, section_name, dir_name)
 
                 if mode:
-                    # evaluation_scores (list): auc, p_auc, prec, recall, f1_score
+                    # evaluation_scores (tuple): auc, p_auc, prec, recall, f1_score
                     eval_scores = calc_evaluation_scores(
                         y_true, y_pred, decision_threshold
                     )
