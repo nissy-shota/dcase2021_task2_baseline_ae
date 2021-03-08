@@ -65,6 +65,7 @@ class DcaseDataset(torch.utils.data.Dataset):
 
             # shape = (#frames, #dims)
             features = util.extract_feature(file_name, config=CONFIG["feature"])
+            features = features[:: CONFIG["feature"]["n_hop_frames"], :]
 
             if file_id == 0:
                 # shape = (#total frames over all audio files, #dim. of feature vector)
