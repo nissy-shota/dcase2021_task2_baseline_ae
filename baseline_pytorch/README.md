@@ -36,7 +36,7 @@ Options:
 | `-d`                        | `--dev`                           | Mode for the development dataset                             |  
 | `-e`                        | `--eval`                          | Mode for the additional training and evaluation datasets     | 
 
-`00_train.py` trains a model for each machine type and store the trained models in the directory `model/`.
+`training.py` trains a model for each machine type and store the trained models in the directory `model/`.
 
 ### 3. Run test script (for the development dataset)
 Run the test script `test.py`.
@@ -45,7 +45,7 @@ Use the option `-d` for the development dataset `dev_data/<machine_type>/test/`.
 $ python3 test.py -d
 ```
 The options for `test.py` are the same as those for `training.py`.
-`01_test.py` calculates an anomaly score for each wav file in the directories `dev_data/<machine_type>/source_test/` and `dev_data/<machine_type>/target_test/`.
+`test.py` calculates an anomaly score for each wav file in the directories `dev_data/<machine_type>/source_test/` and `dev_data/<machine_type>/target_test/`.
 A csv file for each section including the anomaly scores will be stored in the directory `result/`.
 If the mode is "development", the script also outputs another csv file including AUC, pAUC, precision, recall, and F1-score for each section.
 
