@@ -36,10 +36,7 @@ from torch import optim
 from torch.utils.data.dataset import Subset
 from torchinfo import summary
 
-try:
-    from sklearn.externals import joblib
-except ImportError:
-    import joblib
+import joblib
 
 # Local application/library specific imports.
 import util
@@ -213,6 +210,7 @@ def calc_anomaly_score(model, data_loader):
             loss = model.get_loss(data)
             anomaly_score.append(loss)
 
+    anomaly_score = numpy.array(anomaly_score, dtype=float)
     gamma_params = scipy.stats.gamma.fit(anomaly_score)
     gamma_params = list(gamma_params)
 
