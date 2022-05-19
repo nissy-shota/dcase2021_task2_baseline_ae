@@ -40,6 +40,7 @@ import joblib
 
 # Local application/library specific imports.
 import util
+from util import EarlyStopping
 from pytorch_model import AutoEncoder
 
 # Load configuration from YAML file.
@@ -208,7 +209,7 @@ def calc_anomaly_score(model, data_loader):
             data = data.to(DEVICE)  # send data to GPU
             data = data.float()  # workaround
             loss = model.get_loss(data)
-            anomaly_score.append(loss)
+            anomaly_score.append(loss.item())
 
     anomaly_score = numpy.array(anomaly_score, dtype=float)
     gamma_params = scipy.stats.gamma.fit(anomaly_score)
@@ -267,6 +268,8 @@ def main():
 
     # make output directory
     os.makedirs(CONFIG["model_directory"], exist_ok=True)
+    os.makedirs(CONFIG["loss_directory"], exist_ok=True)
+    os.makedirs(CONFIG["scores_directory"], exist_ok=True)
 
     # load base_directory list
     dir_list = util.select_dirs(config=CONFIG, mode=mode)
@@ -305,17 +308,50 @@ def main():
         )
 
         # training loop
+
+        training_losses: list[float] = []
+        validation_losses: list[float] = []
+
+        early_stopping = EarlyStopping(
+            patience=10,
+            verbose=True,
+            model_dir=CONFIG["model_directory"],
+            machine_type=os.path.split(target_dir)[1],
+        )
         for epoch in range(1, CONFIG["training"]["epochs"] + 1):
             print("Epoch {:2d}: ".format(epoch), end="")
-            training(
+
+            training_loss = training(
                 model=model,
                 data_loader=data_loader["train"],
                 optimizer=optimizer,
                 # scheduler=scheduler  # optional
             )
-            validation(model=model, data_loader=data_loader["val"])
+            training_losses.append(training_loss)
+
+            validation_loss = validation(model=model, data_loader=data_loader["val"])
+            validation_losses.append(validation_loss)
+            early_stopping(validation_loss, model)
+
+            if early_stopping.early_stop:
+                print("Early stopping")
+                break
 
         del data_loader  # delete the dataset for training.
+
+        util.visualizing_loss_and_early_stopping(
+            train_loss=training_losses,
+            valid_loss=validation_losses,
+            save_dir=CONFIG["loss_directory"],
+            file_name=os.path.split(target_dir)[1],
+        )
+
+        print("============== SAVE MODEL ==============")
+        save_model(
+            model,
+            model_dir=CONFIG["model_directory"],
+            machine_type=os.path.split(target_dir)[1],
+        )
 
         # fit gamma distribution for anomaly scores
         # and save the parameters of the distribution

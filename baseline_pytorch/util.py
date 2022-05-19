@@ -34,6 +34,7 @@ import sys
 import librosa
 import librosa.core
 import librosa.feature
+import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
@@ -318,3 +319,88 @@ def save_csv(save_file_path, save_data):
     with open(save_file_path, "w", newline="") as csv_file:
         writer = csv.writer(csv_file, lineterminator="\n")
         writer.writerows(save_data)
+
+
+class EarlyStopping:
+    """
+    early stopping class
+    """
+
+    def __init__(
+        self,
+        patience: int = 10,
+        verbose: bool = False,
+        model_dir: str = "any",
+        machine_type: str = "any",
+    ):
+        """_summary_
+
+        Args:
+            patience (int, optional): _description_. Defaults to 10.
+            verbose (bool, optional): _description_. Defaults to False.
+            path (str, optional): _description_. Defaults to ''.
+        """
+
+        self.patience = patience
+        self.verbose = verbose
+        self.model_dir = model_dir
+        self.machine_type = machine_type
+
+        self.counter = 0
+        self.best_score = None
+        self.early_stop = False
+        self.val_loss_min = np.Inf
+
+    def __call__(self, val_loss: float, model):
+
+        score = -val_loss
+
+        if self.best_score is None:
+            self.best_score = score
+        elif score < self.best_score:
+            self.counter += 1
+            print(f"EarlyStopping counter: {self.counter} out of {self.patience}")
+            if self.counter >= self.patience:
+                self.early_stop = True
+                self.save_checkpoint(val_loss, model)
+        else:
+            self.best_score = score
+            self.counter = 0
+
+    def save_checkpoint(self, val_loss: float, model):
+
+        if self.verbose:
+            print(
+                f"Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ..."
+            )
+
+        print("============== SAVE MODEL ==============")
+        model_file_path = "{model}/model_{machine_type}.hdf5".format(
+            model=self.model_dir, machine_type=self.machine_type
+        )
+        torch.save(model.state_dict(), model_file_path)
+        print("save_model -> %s" % (model_file_path))
+
+
+def visualizing_loss_and_early_stopping(
+    train_loss, valid_loss, save_dir, file_name, ext=".png"
+):
+
+    save_path = os.path.join(save_dir, file_name + "losses" + ext)
+
+    fig = plt.figure(figsize=(10, 8))
+    plt.plot(range(1, len(train_loss) + 1), train_loss, label="Training Loss")
+    plt.plot(range(1, len(valid_loss) + 1), valid_loss, label="Validation Loss")
+
+    # find position of lowest validation loss
+    minposs = valid_loss.index(min(valid_loss)) + 1
+    plt.axvline(minposs, linestyle="--", color="r", label="Early Stopping Checkpoint")
+
+    plt.xlabel("epochs")
+    plt.ylabel("loss")
+    plt.ylim(0, 0.5)  # consistent scale
+    plt.xlim(0, len(train_loss) + 1)  # consistent scale
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    fig.savefig(save_path, bbox_inches="tight")
