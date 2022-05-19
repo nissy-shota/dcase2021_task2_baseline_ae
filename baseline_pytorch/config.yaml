@@ -1,7 +1,9 @@
-dev_directory: ../dev_data
-eval_directory: ../eval_data
-model_directory: ./model
-result_directory: ./result
+dev_directory: /home/shota/Research/complex_anomaly_sound_detection/data/dev_data
+eval_directory: /home/shota/Research/complex_anomaly_sound_detection/data/eval_data
+model_directory: ./results/model
+loss_directory: ./results/losses
+scores_directory: ./results/scores
+result_directory: ./results
 result_file: result.csv
 
 max_fpr: 0.1
