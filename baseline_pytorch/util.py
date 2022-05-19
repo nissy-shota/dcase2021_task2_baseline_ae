@@ -36,6 +36,7 @@ import librosa.core
 import librosa.feature
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 import yaml
 
 __VERSIONS__ = "1.0.0"
