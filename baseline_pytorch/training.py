@@ -233,7 +233,7 @@ def fit_gamma_dist(dataset, model, target_dir):
     # fit gamma distribution for anomaly scores
     gamma_params = calc_anomaly_score(model=model, data_loader=data_loader)
     score_file_path = "{model}/score_distr_{machine_type}.pkl".format(
-        model=CONFIG["model_directory"], machine_type=os.path.split(target_dir)[1]
+        model=CONFIG["scores_directory"], machine_type=os.path.split(target_dir)[1]
     )
     # save the parameters of the distribution
     joblib.dump(gamma_params, score_file_path)
@@ -247,9 +247,7 @@ def save_model(model, model_dir, machine_type):
     model_file_path = "{model}/model_{machine_type}.hdf5".format(
         model=model_dir, machine_type=machine_type
     )
-    # if os.path.exists(model_file_path):
-    #     print("Model already exists!")
-    #     continue
+
     torch.save(model.state_dict(), model_file_path)
     print("save_model -> %s" % (model_file_path))
 
@@ -344,13 +342,6 @@ def main():
             valid_loss=validation_losses,
             save_dir=CONFIG["loss_directory"],
             file_name=os.path.split(target_dir)[1],
-        )
-
-        print("============== SAVE MODEL ==============")
-        save_model(
-            model,
-            model_dir=CONFIG["model_directory"],
-            machine_type=os.path.split(target_dir)[1],
         )
 
         # fit gamma distribution for anomaly scores
