@@ -260,6 +260,7 @@ def main():
     # check mode
     # "development": mode == True
     # "evaluation": mode == False
+    enable_early_stopping = False
     mode = util.command_line_chk()  # constant: True or False
     if mode is None:
         sys.exit(-1)
@@ -309,13 +310,13 @@ def main():
 
         training_losses: list[float] = []
         validation_losses: list[float] = []
-
-        early_stopping = EarlyStopping(
-            patience=10,
-            verbose=True,
-            model_dir=CONFIG["model_directory"],
-            machine_type=os.path.split(target_dir)[1],
-        )
+        if enable_early_stopping:
+            early_stopping = EarlyStopping(
+                patience=10,
+                verbose=True,
+                model_dir=CONFIG["model_directory"],
+                machine_type=os.path.split(target_dir)[1],
+            )
         for epoch in range(1, CONFIG["training"]["epochs"] + 1):
             print("Epoch {:2d}: ".format(epoch), end="")
 
@@ -329,11 +330,13 @@ def main():
 
             validation_loss = validation(model=model, data_loader=data_loader["val"])
             validation_losses.append(validation_loss)
-            early_stopping(validation_loss, model)
+            if enable_early_stopping:
+                early_stopping(validation_loss, model)
 
-            if early_stopping.early_stop:
-                print("Early stopping")
-                break
+            if enable_early_stopping:
+                if early_stopping.early_stop:
+                    logger.info("Early stopping")
+                    break
 
         del data_loader  # delete the dataset for training.
 
