@@ -102,8 +102,7 @@ def calc_anomaly_score(model, file_path):
         print("File broken!!: {}".format(file_path))
 
     feed_data = torch.from_numpy(data).clone()
-    feed_data.to(DEVICE)
-    feed_data = feed_data.float()
+    feed_data = feed_data.to(DEVICE).float()
     with torch.no_grad():
         pred = model(feed_data)
         pred = pred.to("cpu").detach().numpy().copy()
@@ -259,7 +258,7 @@ def main():
     # check mode
     # "development": mode == True
     # "evaluation": mode == False
-    mode = util.command_line_chk()  # constant: True or False
+    mode = True # constant: True or False
     if mode is None:
         sys.exit(-1)
 
