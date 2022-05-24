@@ -335,7 +335,7 @@ def main():
 
             if enable_early_stopping:
                 if early_stopping.early_stop:
-                    logger.info("Early stopping")
+                    print("Early stopping")
                     break
 
         del data_loader  # delete the dataset for training.
