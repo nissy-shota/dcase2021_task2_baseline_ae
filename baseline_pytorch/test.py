@@ -81,7 +81,7 @@ def calc_decision_threshold(target_dir):
 
     # load anomaly score distribution for determining threshold
     score_distr_file_path = "{model}/score_distr_{machine_type}.pkl".format(
-        model=CONFIG["model_directory"], machine_type=os.path.split(target_dir)[1]
+        model=CONFIG["scores_directory"], machine_type=os.path.split(target_dir)[1]
     )
     shape_hat, loc_hat, scale_hat = joblib.load(score_distr_file_path)
     # determine threshold for decision
