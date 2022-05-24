@@ -258,7 +258,7 @@ def main():
     # check mode
     # "development": mode == True
     # "evaluation": mode == False
-    mode = True # constant: True or False
+    mode = util.command_line_chk()  # constant: True or False
     if mode is None:
         sys.exit(-1)
 
