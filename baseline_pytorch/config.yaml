@@ -1,5 +1,5 @@
-dev_directory: /home/shota/Research/complex_anomaly_sound_detection/data/dev_data
-eval_directory: /home/shota/Research/complex_anomaly_sound_detection/data/eval_data
+dev_directory: /home/nishiyama/data/DCASE2021/dev_data
+eval_directory: /home/nishiyama/data/DCASE2021/eval_data
 model_directory: ./results/model
 loss_directory: ./results/losses
 scores_directory: ./results/scores
@@ -25,7 +25,7 @@ model:
 
 training:
   learning_rate: 0.001
-  epochs : 1
+  epochs : 20
   batch_size : 128
   shuffle : True
   validation_split : 0.1
