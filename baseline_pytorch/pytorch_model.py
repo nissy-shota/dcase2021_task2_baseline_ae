@@ -46,9 +46,9 @@ class AutoEncoder(nn.Module):
         self.layers = nn.ModuleList(layers)
 
         bnorms = [nn.BatchNorm1d(h_dim) for _ in range(self.n_hidden + 1)]
-        bnorms += [nn.BatchNorm1d(z_dim)]
-        bnorms += [nn.BatchNorm1d(h_dim) for _ in range(self.n_hidden + 1)]
-        self.bnorms = nn.ModuleList(bnorms)
+        # bnorms += [nn.BatchNorm1d(z_dim)]
+        # bnorms += [nn.BatchNorm1d(h_dim) for _ in range(self.n_hidden + 1)]
+        # self.bnorms = nn.ModuleList(bnorms)
 
         self.activation = nn.ReLU()
         self.criterion = nn.MSELoss()
@@ -57,9 +57,9 @@ class AutoEncoder(nn.Module):
         """
         Reconstruct inputs through AutoEncoder.
         """
-        hidden = self.activation(self.bnorms[0](self.layers[0](inputs)))
+        hidden = self.activation(self.layers[0](inputs))
         for i in range(2 * (self.n_hidden + 1)):  # i : 0 to 2 * self.n_hidden + 1
-            hidden = self.activation(self.bnorms[i + 1](self.layers[i + 1](hidden)))
+            hidden = self.activation(self.layers[i + 1](hidden))
         output = self.layers[-1](hidden)
 
         return output
